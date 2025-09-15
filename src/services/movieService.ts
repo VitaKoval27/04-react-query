@@ -3,7 +3,7 @@ import type { Movie} from '../types/movie';
 
 const TMDB_TOKEN = import.meta.env.VITE_TMDB_TOKEN;
 
-interface PaginatedMovies {
+ export interface PaginatedMovies {
   results: Movie[];
   total_pages: number;
 }

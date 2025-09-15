@@ -17,7 +17,4 @@ export interface Movie {
   vote_count: number;
 }
 
-export interface PaginatedMovies {
-  results: Movie[];
-  total_pages: number;
-}
+

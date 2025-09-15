@@ -7,10 +7,11 @@ import ErrorMessage from '../ErrorMessage/ErrorMessage';
 import MovieGrid from '../MovieGrid/MovieGrid';
 import MovieModal from '../MovieModal/MovieModal';
 import Pagination from '../Pagination/Pagination';
-import { fetchMovies } from '../../services/movieService';
-import type { Movie, PaginatedMovies } from '../../types/movie';
+import { fetchMovies,type PaginatedMovies} from '../../services/movieService';
+import type { Movie  } from '../../types/movie';
 import { Toaster } from 'react-hot-toast';
 import toast from 'react-hot-toast';
+import styles from './App.module.css';
 
 function App() {
   const [query, setQuery] = useState<string>('');
@@ -36,13 +37,7 @@ function App() {
     }
   }, [isSuccess, data, query]);
 
-  const handleSearch = (formData: FormData) => {
-    const newQuery = formData.get('query') as string;
-
-    if (!newQuery || newQuery.trim() === '') {
-      toast.error('Please enter your search query.');
-      return;
-    }
+  const handleSearch = (newQuery: string) => {
     setQuery(newQuery);
     setPage(1);
     setSelectedMovie(null);
@@ -61,9 +56,9 @@ function App() {
   };
 
   return (
-    <>
+    <div className={styles.container}>
       <Toaster />
-      <SearchBar action={handleSearch} />
+      <SearchBar onSearch={handleSearch} />
       
       {isLoading && <Loader />}
       
@@ -89,7 +84,7 @@ function App() {
       )}
       
       {!import.meta.env.PROD && <ReactQueryDevtools initialIsOpen={false} />}
-    </>
+    </div>
   );
 }
 
