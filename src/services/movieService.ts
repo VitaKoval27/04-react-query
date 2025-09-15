@@ -1,7 +1,12 @@
 import axios from 'axios';
-import type { Movie, PaginatedMovies } from '../types/movie';
+import type { Movie} from '../types/movie';
 
 const TMDB_TOKEN = import.meta.env.VITE_TMDB_TOKEN;
+
+interface PaginatedMovies {
+  results: Movie[];
+  total_pages: number;
+}
 
 interface TmdbMovieResponse {
   results: Movie[];

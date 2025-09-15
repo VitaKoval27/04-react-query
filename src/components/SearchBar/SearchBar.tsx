@@ -1,30 +1,10 @@
-import { Formik, Form, Field } from 'formik';
-import type { FormikHelpers } from 'formik';
-import toast from 'react-hot-toast';
-import styles from './SearchBar.module.css';
+import styles from "./SearchBar.module.css";
 
 interface SearchBarProps {
-  onSubmit: (query: string) => void;
+  action: (formData: FormData) => void;
 }
 
-interface FormValues {
-  query: string;
-}
-
-export default function SearchBar({ onSubmit }: SearchBarProps) {
-  const handleSubmit = (
-    values: FormValues,
-    actions: FormikHelpers<FormValues>
-  ) => {
-    if (!values.query || values.query.trim() === '') {
-      toast.error('Please enter your search query.');
-      actions.setSubmitting(false);
-      return;
-    }
-    onSubmit(values.query);
-    actions.setSubmitting(false);
-  };
-
+export default function SearchBar({ action }: SearchBarProps) {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
@@ -36,24 +16,19 @@ export default function SearchBar({ onSubmit }: SearchBarProps) {
         >
           Powered by TMDB
         </a>
-        <Formik
-          initialValues={{ query: '' }}
-          onSubmit={handleSubmit}
-        >
-          <Form className={styles.form}>
-            <Field
-              className={styles.input}
-              type="text"
-              name="query"
-              autoComplete="off"
-              placeholder="Search movies..."
-              autoFocus
-            />
-            <button className={styles.button} type="submit">
-              Search
-            </button>
-          </Form>
-        </Formik>
+        <form className={styles.form} action={action}>
+          <input
+            className={styles.input}
+            type="text"
+            name="query"
+            autoComplete="off"
+            placeholder="Search movies..."
+            autoFocus
+          />
+          <button className={styles.button} type="submit">
+            Search
+          </button>
+        </form>
       </div>
     </header>
   );

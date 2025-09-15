@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import SearchBar from '../SearchBar/SearchBar';
 import Loader from '../Loader/Loader';
@@ -10,6 +10,7 @@ import Pagination from '../Pagination/Pagination';
 import { fetchMovies } from '../../services/movieService';
 import type { Movie, PaginatedMovies } from '../../types/movie';
 import { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 function App() {
   const [query, setQuery] = useState<string>('');
@@ -21,13 +22,27 @@ function App() {
     isLoading,
     isError,
     error,
+    isSuccess,
   } = useQuery<PaginatedMovies, Error>({
     queryKey: ['movies', query, page],
     queryFn: () => fetchMovies(query, page),
     enabled: !!query,
+    placeholderData: keepPreviousData,
   });
 
-  const handleSearch = (newQuery: string) => {
+  useEffect(() => {
+    if (isSuccess && data && data.results && data.results.length === 0 && query) {
+      toast.error('No movies found for your query.');
+    }
+  }, [isSuccess, data, query]);
+
+  const handleSearch = (formData: FormData) => {
+    const newQuery = formData.get('query') as string;
+
+    if (!newQuery || newQuery.trim() === '') {
+      toast.error('Please enter your search query.');
+      return;
+    }
     setQuery(newQuery);
     setPage(1);
     setSelectedMovie(null);
@@ -35,10 +50,6 @@ function App() {
 
   const handlePageChange = (selectedPage: number) => {
     setPage(selectedPage + 1);
-  };
-
-  const handleErrorClose = () => {
-    setQuery('');
   };
 
   const handleMovieSelect = (movie: Movie) => {
@@ -52,12 +63,12 @@ function App() {
   return (
     <>
       <Toaster />
-      <SearchBar onSubmit={handleSearch} />
+      <SearchBar action={handleSearch} />
       
       {isLoading && <Loader />}
       
       {isError && error && (
-        <ErrorMessage message={error.message} onClose={handleErrorClose} />
+        <ErrorMessage message={error.message} onClose={() => setQuery('')} />
       )}
 
       {data && data.results && data.results.length > 0 && (
@@ -71,12 +82,6 @@ function App() {
             />
           )}
         </>
-      )}
-      
-      {data && data.results && data.results.length === 0 && query && !isLoading && !isError && (
-        <p style={{ textAlign: 'center', marginTop: '20px' }}>
-          No movies found for your query.
-        </p>
       )}
 
       {selectedMovie && (
